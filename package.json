@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "handlebars": "~2.0.0",
+    "grunt": "~0.4.5",
+    "grunt-contrib-sass": "~0.8.1"
+  }
+}
