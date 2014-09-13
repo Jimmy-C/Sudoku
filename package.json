@@ -1,7 +1,12 @@
 {
   "devDependencies": {
-    "handlebars": "~2.0.0",
     "grunt": "~0.4.5",
-    "grunt-contrib-sass": "~0.8.1"
+    "grunt-contrib-sass": "~0.8.1",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-concat": "~0.5.0",
+    "grunt-shell": "~1.1.1",
+    "load-grunt-tasks": "~0.6.0",
+    "grunt-contrib-handlebars": "~0.8.0"
   }
 }

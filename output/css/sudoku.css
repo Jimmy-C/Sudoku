@@ -1,0 +1,11 @@
+#sudoku-container {
+  width: 990px;
+  margin: 0 auto;
+}
+
+.sudoku-board {
+  width: 100%;
+  border: 2px solid #4A4A4A;
+  border-spacing: 0;
+  border-collapse: separate;
+}
