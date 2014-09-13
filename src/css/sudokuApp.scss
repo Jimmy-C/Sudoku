@@ -1,2 +1,5 @@
-@import 'modules/app.scss';
-@import 'modules/sudokuBoard.scss';
+@import 'partials/colors';
+@import 'partials/font';
+@import 'mixins/vendors';
+@import 'modules/app';
+@import 'modules/sudokuBoard';

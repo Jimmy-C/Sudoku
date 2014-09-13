@@ -1,4 +1,16 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: $font-family;
+    font-size: $font-size-large;
+}
+
 #sudoku-container {
-    width: 990px;
     margin: 0 auto;
+    margin-top: 60px;
+    margin-bottom: 60px;
+    height: 100%;
 }

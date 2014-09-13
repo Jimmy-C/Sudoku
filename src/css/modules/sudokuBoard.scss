@@ -1,6 +1,56 @@
 .sudoku-board {
-    width: 100%;
-    border: 2px solid #4A4A4A;
+    margin: 0 auto;
+    width: auto;
+    height: 100%;
+    border: 2px solid $gray;
     border-spacing: 0;
-    border-collapse: separate;
+    @include border-radius(20px);
+}
+
+.sudoku-3x3-table {
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.sudoku-3x3-table td {
+    width: 60px;
+    height: 60px;
+    border: 1.5px dashed $light-gray;
+    color: $font-color-guess;
+    cursor: pointer;
+}
+
+td.initialDataValue {
+    color: $font-color-initial;
+    cursor: default;
+}
+
+td[data-row="1"] {
+    border-top-width: 0px;
+}
+
+td[data-column="1"] {
+    border-left-width: 0px;
+}
+
+td[data-row="3"] {
+    border-bottom-width: 0px;
+}
+
+td[data-column="3"] {
+    border-right-width: 0px;
+}
+ 
+td[data-table="2"], td[data-table="4"], td[data-table="6"], td[data-table="8"] {
+    background-color: $lightest-gray;
+}
+
+tr[data-board-row="1"] > td[data-table],
+tr[data-board-row="2"] > td[data-table] {
+    border-bottom: 2px solid $gray;
+}
+
+td[data-board-column="1"][data-table],
+td[data-board-column="2"][data-table] {
+    border-right: 2px solid $gray;
 }

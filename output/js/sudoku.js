@@ -1,7 +1,7 @@
-var sudokuApp = function() {
+var SudokuApp = function() {
 
     function createBoard() {
-        var board = sudokuBoard.generateBoard();
+        var board = SudokuBoard.generateBoard();
     }
 
     return {
