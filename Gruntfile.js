@@ -14,7 +14,7 @@ module.exports = function(grunt) {
             debug: {
                 files: [
                     {expand: true, cwd: 'src/', dest: '<%= debugPath %>',
-                        src: 'js/*.js'
+                        src: 'js/**'
                     },
 
                     {expand: true, cwd: 'src/', dest: '<%= debugPath %>',
@@ -89,7 +89,7 @@ module.exports = function(grunt) {
                 banner: "'use strict';\n",
               },
               files: {
-                '<%= debugPath %>sudoku.js': ['<%= debugPath %>/js/*.js'],
+                '<%= debugPath %>sudoku.js': ['<%= debugPath %>/js/**/*.js'],
               },
             },
             dist: {
@@ -98,7 +98,7 @@ module.exports = function(grunt) {
                 banner: "'use strict';\n",
               },
               files: {
-                '<%= distPath %>sudoku.js': ['<%= distPath %>/js/*.js'],
+                '<%= distPath %>sudoku.js': ['<%= distPath %>/js/**/*.js'],
               },
             },
         }

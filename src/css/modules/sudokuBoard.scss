@@ -5,6 +5,7 @@
     border: 2px solid $gray;
     border-spacing: 0;
     @include border-radius(20px);
+    z-index: 500;
 }
 
 .sudoku-3x3-table {
@@ -13,40 +14,67 @@
 }
 
 .sudoku-3x3-table td {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border: 1.5px dashed $light-gray;
     color: $font-color-guess;
     cursor: pointer;
+    box-sizing: border-box;
+
+    &:not(.initialDataValue):hover {
+        background-color: $very-light-gray;
+        background-clip: padding-box;
+    }
+
+    &.selected {
+        box-shadow: 0 0 0 3px $royal-blue;
+    }
+
+    &.initialDataValue {
+        color: $font-color-initial;
+        cursor: default;
+    }
+
+    &.hasGuessValue {
+        color: $royal-blue;
+    }
 }
 
-td.initialDataValue {
-    color: $font-color-initial;
-    cursor: default;
-}
-
-td[data-row="1"] {
+td[data-sub-table-row="1"] {
     border-top-width: 0px;
 }
 
-td[data-column="1"] {
+td[data-sub-table-column="1"] {
     border-left-width: 0px;
 }
 
-td[data-row="3"] {
+td[data-sub-table-row="3"] {
     border-bottom-width: 0px;
 }
 
-td[data-column="3"] {
+td[data-sub-table-column="3"] {
     border-right-width: 0px;
+}
+
+td[data-table="1"] td[data-sub-table-column="1"][data-sub-table-row="1"] {
+    @include border-top-left-radius(15px);
+}
+td[data-table="3"] td[data-sub-table-column="3"][data-sub-table-row="1"] {
+    @include border-top-right-radius(15px);
+}
+td[data-table="7"] td[data-sub-table-column="1"][data-sub-table-row="3"] {
+    @include border-bottom-left-radius(15px);
+}
+td[data-table="9"] td[data-sub-table-column="3"][data-sub-table-row="3"] {
+    @include border-bottom-right-radius(15px);
 }
  
 td[data-table="2"], td[data-table="4"], td[data-table="6"], td[data-table="8"] {
     background-color: $lightest-gray;
 }
 
-tr[data-board-row="1"] > td[data-table],
-tr[data-board-row="2"] > td[data-table] {
+td[data-board-row="1"][data-table],
+td[data-board-row="2"][data-table] {
     border-bottom: 2px solid $gray;
 }
 
