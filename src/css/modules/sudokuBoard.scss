@@ -38,6 +38,10 @@
     &.hasGuessValue {
         color: $royal-blue;
     }
+
+    &.violatingRules:not(.initialDataValue) {
+        color: $royal-red;
+    }
 }
 
 td[data-sub-table-row="1"] {

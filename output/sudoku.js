@@ -70,7 +70,6 @@ var SudokuBoard = function() {
     var _board;
 
     var sudokuContainerId = "#sudoku-container";
-
     // Class for the initial data value.
     var initialDataValueClass = "initialDataValue";
 
@@ -88,6 +87,68 @@ var SudokuBoard = function() {
     }
 
     /**
+     * Turns on/off the class based on the toggle value. If yes, add the class to the subsquare,
+     * remove it otherwise.
+     * @param subSquares {Array} - array of sub squares.
+     * @param toggle {Boolean} - true then add the class to the sub squares, remove the class otherwise.
+     */
+    function toggleClass(subSquares, toggle) {
+        var violatingRulesClass = 'violatingRules';
+        subSquares.forEach(function(subSquare, index) {
+            var $subSquare = $(subSquare);
+            if (!$subSquare.hasClass('initialDataValue') && $subSquare.text()) {
+                $(subSquare).toggleClass(violatingRulesClass, toggle);
+            }
+        });
+    }
+
+    /**
+     * Returns true if no sub square retrieved based on the input is violating rules.
+     * Check if the newly guess value is violating the game rules (having a duplicate).
+     * if yes, indicate on the UI that the row, column, or sub table is violating rules.
+     * @param rowColumnData {Object} - {
+     *      boardColumn {String} - 1 represents the left most 3 tables, 2 represents the middle 3 tables,
+     *                             3 represents the right most 3 tables.
+     *      subTableColumn {String} - same as above, but choosing the columns in the sub 3x3 table.
+     *      boardRow {String} - 1 represents the top most 3 tables, 2 represents the middle 3 tables,
+     *                          3 represents the bottom 3 tables.
+     *      subTableRow {String} - same as above, but choosing the rows in the sub 3x3 table.
+     *      table {String} - the table number to select from.
+     * }
+     * @return {Boolean} - true if no sub square is violating reles, false otherwise.
+     */
+    function checkIfViolatingRules(rowColumnData) {
+        var subSquaresViolatingRules = [];
+        var subSquareObeyingRules = [];
+
+        var rowSubSquares = SudokuUtils.rowSubSquaresSelector(_board, rowColumnData.boardRow, rowColumnData.subTableRow);
+        if (SudokuChecker.isViolatingRules(rowSubSquares)) {
+            subSquaresViolatingRules = subSquaresViolatingRules.concat(rowSubSquares);
+        } else {
+            subSquareObeyingRules = subSquareObeyingRules.concat(rowSubSquares);
+        }
+
+        var columnSubSquares = SudokuUtils.columnSubSquaresSelector(_board, rowColumnData.boardColumn, rowColumnData.subTableColumn);
+        if (SudokuChecker.isViolatingRules(columnSubSquares)) {
+            subSquaresViolatingRules = subSquaresViolatingRules.concat(columnSubSquares);
+        } else {
+            subSquareObeyingRules = subSquareObeyingRules.concat(columnSubSquares);
+        }
+
+        var tableSubSquares = SudokuUtils.tableSubSquaresSelector(_board, rowColumnData.table);
+        if (SudokuChecker.isViolatingRules(tableSubSquares)) {
+            subSquaresViolatingRules = subSquaresViolatingRules.concat(tableSubSquares);
+        } else {
+            subSquareObeyingRules = subSquareObeyingRules.concat(tableSubSquares);
+        }
+
+        toggleClass(subSquareObeyingRules, false);
+        toggleClass(subSquaresViolatingRules, true);
+
+        return subSquaresViolatingRules.length === 0;
+    }
+
+    /**
      * Sub square click handler. This handler finds out the row and column data about the 
      * sub square and generates the guess options for the player to guess from.
      * @param evt {jQuery Object} - jQuery event object.
@@ -96,11 +157,21 @@ var SudokuBoard = function() {
         // Put the guess value into the corresponding sub square.
         // Removes the outline surrounding the selected sub square.
         function onGuessValueSelected(guessValue) {
+            var hasValueChanged = guessValue !== parseInt(target.text(), 10);
+
             target.removeClass('selected')
                 .text(guessValue)
 
             if (!target.hasClass('hasGuessValue')) {
                 target.addClass('hasGuessValue');
+            }
+
+            if (hasValueChanged && checkIfViolatingRules(rowColumnData)) {
+                if (SudokuChecker.isGameSolved(_board)) {
+                    console.log("solved!");
+                } else {
+                    console.log("not yet");
+                }
             }
         }
 
@@ -192,6 +263,93 @@ var SudokuBoardData = function() {
     }; 
 }();
 /**
+ * SudokuChecker is responsible for checking if the game is solved or check if some guess values
+ * are violating the rules.
+ */
+var SudokuChecker = function() {
+
+    /**
+     * Returns true if all the values in the array are unique.
+     * @param arr {Array} - an array containing values.
+     * @return {Boolean} - true if all the values in the array are unique, false otherwise.
+     */
+    function hasOnlyUniqueValues(arr) {
+        return arr.every(function(value, index) {
+            return index === arr.indexOf(value);
+        }); 
+    }
+
+    function hasNoEmptyValues(arr) {
+        return arr.every(function(value, index) {
+            return !!value;
+        });
+    }
+
+    /**
+     * Returns an array containing all the values in the sub squares.
+     * @param subSquares {Array} - sub squares in the Sudoku board.
+     * @param includeEmpty {Boolean} - true if empty values should be considered as well.
+     * @return {Array} - an array of values.
+     */
+    function getValuesFromSubSquare(subSquares, includeEmpty) {
+        var values = [];
+        subSquares.forEach(function(subSquare) {
+            if (subSquare.textContent || includeEmpty) {
+                values.push(subSquare.textContent);
+            }
+        });
+        return values;
+    }
+
+    /**
+     * Returns true if the game is solved, false otherwise.
+     * @param board {jQuery Object} - current state of the board.
+     * @return {Boolean} - true if the game is solved, false otherwise.
+     */
+    function isGameSolved(board) {
+        // Check all the board rows and columns.
+        for (var i = 1; i <= 3; i++) {
+            for (var j = 1; j <=3; j++) {
+                var rowSubSquares = SudokuUtils.rowSubSquaresSelector(board, i, j);
+                var columnSubSquares = SudokuUtils.columnSubSquaresSelector(board, i, j);
+                if (!isCompleteAndNotViolatingRules(rowSubSquares) || !isCompleteAndNotViolatingRules(columnSubSquares)) {
+                    return false;
+                }
+            }
+        }
+
+        // Check each individual table
+        for (var tableNum = 1; tableNum <= 9; tableNum++) {
+            var subTableSubSquares = SudokuUtils.tableSubSquaresSelector(board, tableNum);
+            if (!isCompleteAndNotViolatingRules(subTableSubSquares)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function isCompleteAndNotViolatingRules(subSquares) {
+        var values = getValuesFromSubSquare(subSquares, true);
+        return hasNoEmptyValues(values) && hasOnlyUniqueValues(values);
+    }
+
+    /**
+     * Returns true if at least one value in the sub squares is duplicated (violating the game rules).
+     * This function can be used to check for rows, columns, and sub 3x3 tables.
+     * @param subSquares {Array} - sub squares in the Sudoku board.
+     * @return {Boolean} - true if all the values in the array are unique, false otherwise.
+     */
+    function isViolatingRules(subSquares) {
+        var values = getValuesFromSubSquare(subSquares);
+        return !hasOnlyUniqueValues(values);
+    }
+
+    return {
+        isGameSolved : isGameSolved,
+        isViolatingRules : isViolatingRules
+    };
+}();
+/**
  * SudokuUtils contains utility functions for the Sudoku App.
  */
 var SudokuUtils = function() {
@@ -228,6 +386,41 @@ var SudokuUtils = function() {
     }
 
     /**
+     * Returns all the sub squares in the given board row and sub table row in the board.
+     * @param board {jQuery Object} - current state of the board.
+     * @param boardRow {String} - the row number in the board, is between 1 - 3.
+     * @param subTableRow {String} - the row number in the sub 3x3 table, is between 1 - 3.
+     * @return {Array} - an array of sub squares.
+     */
+    function rowSubSquaresSelector(board, boardRow, subTableRow) {
+        var query = rowValuesQueryGenerator(boardRow, subTableRow);
+        return board.find(query).toArray();
+    }
+
+    /**
+     * Returns all the sub squares in the given board column and sub table column in the board.
+     * @param board {jQuery Object} - current state of the board.
+     * @param boardRow {String} - the column number in the board, is between 1 - 3.
+     * @param subTableRow {String} - the column number in the sub 3x3 table, is between 1 - 3.
+     * @return {Array} - an array of sub squares.
+     */
+    function columnSubSquaresSelector(board, boardColumn, subTableColumn) {
+        var query = columnValuesQueryGenerator(boardColumn, subTableColumn);
+        return board.find(query).toArray();
+    }
+
+    /**
+     * Returns all the sub squares in the given sub table number in the board.
+     * @param board {jQuery Object} - current state of the board.
+     * @param tableNum {String} - the table number in the board, is between 1 - 9.
+     * @return {Array} - an array of sub squares.
+     */
+    function tableSubSquaresSelector(board, tableNum) {
+        var query = tableValuesQueryGenerator(tableNum);
+        return board.find(query).toArray();
+    }
+
+    /**
      * Returns the sorted unique initial values based on the board and sub table's row/column data.
      * For example, for boardColumn = 1, subTableColumn = 3, boardRow = 1, subTableRow = 1, table = 1,
      * this function would return all the unique initial values that are in row 1 of the top 3 tables,
@@ -246,8 +439,8 @@ var SudokuUtils = function() {
      */
     function getInitialValuesBasedOn(board, params) {
 
-        function getValues(index, value) {
-            if (value.textContent && value.className === 'initialDataValue') {
+        function getInitialValues(index, value) {
+            if (value.textContent && $(value).hasClass('initialDataValue')) {
                 values.push(value.textContent);
             }
         }
@@ -255,13 +448,13 @@ var SudokuUtils = function() {
         var values = [];
 
         var columnQuery = columnValuesQueryGenerator(params.boardColumn, params.subTableColumn);
-        board.find(columnQuery).each(getValues);
+        board.find(columnQuery).each(getInitialValues);
 
         var rowQuery = rowValuesQueryGenerator(params.boardRow, params.subTableRow);
-        board.find(rowQuery).each(getValues);
+        board.find(rowQuery).each(getInitialValues);
 
         var tableQuery = tableValuesQueryGenerator(params.table);
-        board.find(tableQuery).each(getValues);
+        board.find(tableQuery).each(getInitialValues);
         
         return $.unique(values).map(function(value) {
             return parseInt(value, 10);
@@ -272,6 +465,9 @@ var SudokuUtils = function() {
      * Public Util functions.
      */
     return {
-        getInitialValuesBasedOn : getInitialValuesBasedOn
+        getInitialValuesBasedOn     : getInitialValuesBasedOn,
+        rowSubSquaresSelector       : rowSubSquaresSelector,
+        columnSubSquaresSelector    : columnSubSquaresSelector,
+        tableSubSquaresSelector     : tableSubSquaresSelector
     };
 }();

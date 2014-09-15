@@ -124,6 +124,9 @@ body {
 .sudoku-3x3-table td.hasGuessValue {
   color: #007ee5;
 }
+.sudoku-3x3-table td.violatingRules:not(.initialDataValue) {
+  color: #eb2b36;
+}
 
 td[data-sub-table-row="1"] {
   border-top-width: 0px;

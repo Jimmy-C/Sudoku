@@ -35,6 +35,41 @@ var SudokuUtils = function() {
     }
 
     /**
+     * Returns all the sub squares in the given board row and sub table row in the board.
+     * @param board {jQuery Object} - current state of the board.
+     * @param boardRow {String} - the row number in the board, is between 1 - 3.
+     * @param subTableRow {String} - the row number in the sub 3x3 table, is between 1 - 3.
+     * @return {Array} - an array of sub squares.
+     */
+    function rowSubSquaresSelector(board, boardRow, subTableRow) {
+        var query = rowValuesQueryGenerator(boardRow, subTableRow);
+        return board.find(query).toArray();
+    }
+
+    /**
+     * Returns all the sub squares in the given board column and sub table column in the board.
+     * @param board {jQuery Object} - current state of the board.
+     * @param boardRow {String} - the column number in the board, is between 1 - 3.
+     * @param subTableRow {String} - the column number in the sub 3x3 table, is between 1 - 3.
+     * @return {Array} - an array of sub squares.
+     */
+    function columnSubSquaresSelector(board, boardColumn, subTableColumn) {
+        var query = columnValuesQueryGenerator(boardColumn, subTableColumn);
+        return board.find(query).toArray();
+    }
+
+    /**
+     * Returns all the sub squares in the given sub table number in the board.
+     * @param board {jQuery Object} - current state of the board.
+     * @param tableNum {String} - the table number in the board, is between 1 - 9.
+     * @return {Array} - an array of sub squares.
+     */
+    function tableSubSquaresSelector(board, tableNum) {
+        var query = tableValuesQueryGenerator(tableNum);
+        return board.find(query).toArray();
+    }
+
+    /**
      * Returns the sorted unique initial values based on the board and sub table's row/column data.
      * For example, for boardColumn = 1, subTableColumn = 3, boardRow = 1, subTableRow = 1, table = 1,
      * this function would return all the unique initial values that are in row 1 of the top 3 tables,
@@ -53,8 +88,8 @@ var SudokuUtils = function() {
      */
     function getInitialValuesBasedOn(board, params) {
 
-        function getValues(index, value) {
-            if (value.textContent && value.className === 'initialDataValue') {
+        function getInitialValues(index, value) {
+            if (value.textContent && $(value).hasClass('initialDataValue')) {
                 values.push(value.textContent);
             }
         }
@@ -62,13 +97,13 @@ var SudokuUtils = function() {
         var values = [];
 
         var columnQuery = columnValuesQueryGenerator(params.boardColumn, params.subTableColumn);
-        board.find(columnQuery).each(getValues);
+        board.find(columnQuery).each(getInitialValues);
 
         var rowQuery = rowValuesQueryGenerator(params.boardRow, params.subTableRow);
-        board.find(rowQuery).each(getValues);
+        board.find(rowQuery).each(getInitialValues);
 
         var tableQuery = tableValuesQueryGenerator(params.table);
-        board.find(tableQuery).each(getValues);
+        board.find(tableQuery).each(getInitialValues);
         
         return $.unique(values).map(function(value) {
             return parseInt(value, 10);
@@ -79,6 +114,9 @@ var SudokuUtils = function() {
      * Public Util functions.
      */
     return {
-        getInitialValuesBasedOn : getInitialValuesBasedOn
+        getInitialValuesBasedOn     : getInitialValuesBasedOn,
+        rowSubSquaresSelector       : rowSubSquaresSelector,
+        columnSubSquaresSelector    : columnSubSquaresSelector,
+        tableSubSquaresSelector     : tableSubSquaresSelector
     };
 }();
