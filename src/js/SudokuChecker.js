@@ -39,8 +39,8 @@ var SudokuChecker = function() {
     }
 
     /**
-     * Returns an array containing all the values in the sub squares.
-     * @param subSquares {Array} - sub squares in the Sudoku board.
+     * Returns an array containing all the values in the sub-squares.
+     * @param subSquares {Array} - sub-squares in the Sudoku board.
      * @param includeEmpty {Boolean} - true if empty values should be considered as well.
      * @return {Array} - an array of values.
      */
@@ -55,8 +55,8 @@ var SudokuChecker = function() {
     }
 
     /**
-     * Checks if the sub squares are complete and obeying rules.
-     * Add the sub squares to subSquaresViolatingRules if sub squares are violating the rules or
+     * Checks if the sub-squares are complete and obeying rules.
+     * Add the sub-squares to subSquaresViolatingRules if sub-squares are violating the rules or
      * add to subSquareObeyingRules otherwise.
      * Turn isGameSolved to false if either violating rules or has empty values.
      */
@@ -102,9 +102,9 @@ var SudokuChecker = function() {
     }
 
     /**
-     * Returns true if the sub squares are complete (no empty values) and not violating rules.
-     * @param subSquares {Array} - array of sub squares.
-     * @return {Boolean} - Returns true if the sub squares are complete (no empty values)
+     * Returns true if the sub-squares are complete (no empty values) and not violating rules.
+     * @param subSquares {Array} - array of sub-squares.
+     * @return {Boolean} - Returns true if the sub-squares are complete (no empty values)
      *                     and not violating rules, false otherwise.
      */
     function isComplete(subSquares) {
@@ -113,9 +113,9 @@ var SudokuChecker = function() {
     }
 
     /**
-     * Returns true if at least one value in the sub squares is duplicated (violating the game rules).
+     * Returns true if at least one value in the sub-squares is duplicated (violating the game rules).
      * This function can be used to check for rows, columns, and sub 3x3 tables.
-     * @param subSquares {Array} - sub squares in the Sudoku board.
+     * @param subSquares {Array} - sub-squares in the Sudoku board.
      * @return {Boolean} - true if all the values in the array are unique, false otherwise.
      */
     function isViolatingRules(subSquares) {

@@ -1,13 +1,14 @@
 /* Definitions for all the colors */
 /* Definitions for all the font related styles */
-html, body {
+html, body, p {
   margin: 0;
   padding: 0;
 }
 
 body {
-  font-family: Helvetica, sans-serif;
-  font-size: 2em;
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 #sudoku-container {
@@ -17,9 +18,17 @@ body {
   height: 100%;
 }
 
+.sudoku-instruction {
+  margin-top: 30px;
+  color: #707070;
+  font-size: 1.5em;
+  font-weight: 400;
+  text-align: center;
+}
+
 .guess-values-menu {
   position: relative;
-  top: 30px;
+  top: -30px;
   left: 0;
   right: 0;
   margin-left: auto;
@@ -39,6 +48,12 @@ body {
   border-bottom: 1px solid #959595;
   background-color: white;
   color: #464646;
+  font-size: 2em;
+  webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .guess-value:not(.notSelectable):hover {
   background-color: #e1e1e1;
@@ -46,6 +61,7 @@ body {
 }
 .guess-value.notSelectable {
   color: #c2c2c2;
+  cursor: normal;
 }
 .guess-value:first-child {
   -webkit-border-top-left-radius: 10px;
@@ -109,6 +125,7 @@ body {
   color: #007ee5;
   cursor: pointer;
   box-sizing: border-box;
+  font-size: 2em;
   webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;

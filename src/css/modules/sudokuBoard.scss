@@ -20,6 +20,7 @@
     color: $font-color-guess;
     cursor: pointer;
     box-sizing: border-box;
+    font-size: $font-size-large;
 
     &:not(.initialDataValue):hover {
         background-color: $very-light-gray;

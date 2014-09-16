@@ -2,7 +2,6 @@ var SudokuBoard = function() {
     // Cache the board for selection use later.
     var _board;
 
-    var sudokuContainerId = "#sudoku-container";
     // Class for the initial data value.
     var initialDataValueClass = "initialDataValue";
 
@@ -27,8 +26,8 @@ var SudokuBoard = function() {
     /**
      * Turns on/off the class based on the toggle value. If yes, add the class to the subsquare,
      * remove it otherwise.
-     * @param subSquares {Array} - array of sub squares.
-     * @param toggle {Boolean} - true then add the class to the sub squares, remove the class otherwise.
+     * @param subSquares {Array} - array of sub-squares.
+     * @param toggle {Boolean} - true then add the class to the sub-squares, remove the class otherwise.
      */
     function toggleClass(subSquares, toggle) {
         var violatingRulesClass = 'violatingRules';
@@ -41,13 +40,14 @@ var SudokuBoard = function() {
     }
 
     /**
-     * Sub square click handler. This handler finds out the row and column data about the 
-     * sub square and generates the guess options for the player to guess from.
+     * Sub-square single click handler. This handler finds out the row and column data about the 
+     * sub-square and shows the guess value widget for the player to pick a number. If the guess
+     * value violates the rules, the affected row/column/subtable's values will change.
      * @param evt {jQuery Object} - jQuery event object.
      */
     function subSquareSingleClickHandler(evt) {
-        // Put the guess value into the corresponding sub square.
-        // Removes the outline surrounding the selected sub square.
+        // Put the guess value into the corresponding sub-square.
+        // Removes the outline surrounding the selected sub-square.
         function onGuessValueSelected(guessValue) {
             var hasValueChanged = guessValue !== parseInt(target.text(), 10);
 
@@ -62,12 +62,12 @@ var SudokuBoard = function() {
                 toggleClass(results.subSquaresViolatingRules, true);
                 
                 if (results.isGameSolved) {
-                    
+                    //TODO Implement end of game celebration.
                 }
             }
         }
 
-        // Removes the outline surrounding the selected sub square.
+        // Removes the outline surrounding the selected sub-square.
         function onDismissed() {
             target.removeClass('selected');
         }
@@ -80,6 +80,11 @@ var SudokuBoard = function() {
         GuessValuesWidget.show(initialValues).then(onGuessValueSelected, onDismissed);
     }
 
+    /**
+     * Sub-square double click handler. If the sub-square getting clicked on has
+     * a value, the value will get removed.
+     * @param evt {jQuery Object} - jQuery event object.
+     */    
     function subSquareDoubleClickHandler(evt) {
         var target = $(evt.target);
         var targetValue = target.text();
@@ -92,6 +97,11 @@ var SudokuBoard = function() {
         }
     }
 
+    /**
+     * Handler for the click event. Set a timer with delay, if the player triggers a click
+     * event before the delay ends, fires a double click event handler, otherwise fires the
+     * single click event handler. 
+     */
     function subSquareClickHandler(evt) {
         _click++;
 
@@ -108,7 +118,8 @@ var SudokuBoard = function() {
     }
     
     /**
-     * Generates the sudoku board.
+     * Generates the sudoku board and returns the board.
+     * @return {jQuery Object} - the representation of the board.
      */
     function generateBoard() {
         var sudokuBoardTemplate = $(Sudoku.templates["SudokuBoard"]());
@@ -133,7 +144,7 @@ var SudokuBoard = function() {
         sudokuBoardTemplate.on("click", ".sudoku-3x3-table td:not(.initialDataValue)", subSquareClickHandler);
 
         _board = sudokuBoardTemplate;
-        $(sudokuContainerId).append(sudokuBoardTemplate);
+        return sudokuBoardTemplate;
     }
 
     return {

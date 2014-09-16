@@ -35,11 +35,11 @@ var SudokuUtils = function() {
     }
 
     /**
-     * Returns all the sub squares in the given board row and sub table row in the board.
+     * Returns all the sub-squares in the given board row and sub table row in the board.
      * @param board {jQuery Object} - current state of the board.
      * @param boardRow {String} - the row number in the board, is between 1 - 3.
      * @param subTableRow {String} - the row number in the sub 3x3 table, is between 1 - 3.
-     * @return {Array} - an array of sub squares.
+     * @return {Array} - an array of sub-squares.
      */
     function rowSubSquaresSelector(board, boardRow, subTableRow) {
         var query = rowValuesQueryGenerator(boardRow, subTableRow);
@@ -47,11 +47,11 @@ var SudokuUtils = function() {
     }
 
     /**
-     * Returns all the sub squares in the given board column and sub table column in the board.
+     * Returns all the sub-squares in the given board column and sub table column in the board.
      * @param board {jQuery Object} - current state of the board.
      * @param boardRow {String} - the column number in the board, is between 1 - 3.
      * @param subTableRow {String} - the column number in the sub 3x3 table, is between 1 - 3.
-     * @return {Array} - an array of sub squares.
+     * @return {Array} - an array of sub-squares.
      */
     function columnSubSquaresSelector(board, boardColumn, subTableColumn) {
         var query = columnValuesQueryGenerator(boardColumn, subTableColumn);
@@ -59,10 +59,10 @@ var SudokuUtils = function() {
     }
 
     /**
-     * Returns all the sub squares in the given sub table number in the board.
+     * Returns all the sub-squares in the given sub table number in the board.
      * @param board {jQuery Object} - current state of the board.
      * @param tableNum {String} - the table number in the board, is between 1 - 9.
-     * @return {Array} - an array of sub squares.
+     * @return {Array} - an array of sub-squares.
      */
     function tableSubSquaresSelector(board, tableNum) {
         var query = tableValuesQueryGenerator(tableNum);

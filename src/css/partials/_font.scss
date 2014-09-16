@@ -1,7 +1,9 @@
 /* Definitions for all the font related styles */
-$font-family : Helvetica, sans-serif;
+$font-family : 'Open Sans', sans-serif;
 $font-size-large: 2em;
 $font-size-medium: 1.5em;
-$font-size-small: 1em;
+$font-size-base: 16px;
 $font-color-initial: $very-dark-gray; 
 $font-color-guess: $royal-blue;
+$font-weight-normal: 400;
+$font-weight-bold: 600;

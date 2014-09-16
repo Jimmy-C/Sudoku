@@ -56,13 +56,171 @@ var GuessValuesWidget = function() {
     };
 }();
 var SudokuApp = function() {
+    var sudokuContainerId = "#sudoku-container";
 
     function createBoard() {
-        SudokuBoard.generateBoard();
+        var board = SudokuBoard.generateBoard();
+
+        var instructionTemplate = $(Sudoku.templates["SudokuInstruction"]());
+        $(sudokuContainerId).append(board)
+            .append(instructionTemplate);
     }
 
     return {
         createBoard: createBoard
+    };
+}();
+var SudokuBoard = function() {
+    // Cache the board for selection use later.
+    var _board;
+
+    // Class for the initial data value.
+    var initialDataValueClass = "initialDataValue";
+
+    // variables needed to distinguish between single click and double clicks.
+    var _click = 0;
+    var DELAY = 180;
+    var _timer = null;
+
+    /**
+     * Add a class to all the initial data values, so that we can
+     * add style to them to differentiate from the guess values.
+     * @param template {jQuery Object} - the 3x3 sudoku template.
+     */
+    function addClassToInitialDataValue(template, tableData) {
+        template.find('td').each(function(index, value) {
+            if (tableData[index] !== 0) {
+                $(value).addClass(initialDataValueClass);
+            } 
+        });
+    }
+
+    /**
+     * Turns on/off the class based on the toggle value. If yes, add the class to the subsquare,
+     * remove it otherwise.
+     * @param subSquares {Array} - array of sub-squares.
+     * @param toggle {Boolean} - true then add the class to the sub-squares, remove the class otherwise.
+     */
+    function toggleClass(subSquares, toggle) {
+        var violatingRulesClass = 'violatingRules';
+        subSquares.forEach(function(subSquare, index) {
+            var $subSquare = $(subSquare);
+            if (!$subSquare.hasClass('initialDataValue') && $subSquare.text()) {
+                $(subSquare).toggleClass(violatingRulesClass, toggle);
+            }
+        });
+    }
+
+    /**
+     * Sub-square single click handler. This handler finds out the row and column data about the 
+     * sub-square and shows the guess value widget for the player to pick a number. If the guess
+     * value violates the rules, the affected row/column/subtable's values will change.
+     * @param evt {jQuery Object} - jQuery event object.
+     */
+    function subSquareSingleClickHandler(evt) {
+        // Put the guess value into the corresponding sub-square.
+        // Removes the outline surrounding the selected sub-square.
+        function onGuessValueSelected(guessValue) {
+            var hasValueChanged = guessValue !== parseInt(target.text(), 10);
+
+            target.removeClass('selected')
+                .text(guessValue);
+
+            target.addClass('hasGuessValue');
+
+            if (hasValueChanged) {
+                var results = SudokuChecker.checkIfGameSolved(_board);
+                toggleClass(results.subSquareObeyingRules, false);
+                toggleClass(results.subSquaresViolatingRules, true);
+                
+                if (results.isGameSolved) {
+                    //TODO Implement end of game celebration.
+                }
+            }
+        }
+
+        // Removes the outline surrounding the selected sub-square.
+        function onDismissed() {
+            target.removeClass('selected');
+        }
+
+        var target = $(evt.target);
+        target.addClass('selected');
+        var rowColumnData = SudokuUtils.geRowColumnDataBasedOn(target);
+        // Get all the values that are not available to choose from.
+        var initialValues = SudokuUtils.getInitialValuesBasedOn(_board, rowColumnData);
+        GuessValuesWidget.show(initialValues).then(onGuessValueSelected, onDismissed);
+    }
+
+    /**
+     * Sub-square double click handler. If the sub-square getting clicked on has
+     * a value, the value will get removed.
+     * @param evt {jQuery Object} - jQuery event object.
+     */    
+    function subSquareDoubleClickHandler(evt) {
+        var target = $(evt.target);
+        var targetValue = target.text();
+        if (targetValue) {
+            target.text('');
+            target.removeClass('hasGuessValue');
+            var results = SudokuChecker.checkIfGameSolved(_board);
+            toggleClass(results.subSquareObeyingRules, false);
+            toggleClass(results.subSquaresViolatingRules, true);
+        }
+    }
+
+    /**
+     * Handler for the click event. Set a timer with delay, if the player triggers a click
+     * event before the delay ends, fires a double click event handler, otherwise fires the
+     * single click event handler. 
+     */
+    function subSquareClickHandler(evt) {
+        _click++;
+
+        if (_click === 1) {
+            _timer = setTimeout(function() {
+                subSquareSingleClickHandler(evt);
+                _click = 0;
+            }, DELAY);
+        } else {
+            clearTimeout(_timer);
+            subSquareDoubleClickHandler(evt);
+            _click = 0;
+        }
+    }
+    
+    /**
+     * Generates the sudoku board and returns the board.
+     * @return {jQuery Object} - the representation of the board.
+     */
+    function generateBoard() {
+        var sudokuBoardTemplate = $(Sudoku.templates["SudokuBoard"]());
+        var boardData = SudokuBoardData.generateBoardData();
+
+        for (var i = 1; i <= 9; i++) {
+            var tableData = boardData[i-1];
+            var tableTemplateConfig = {};
+
+            for (var j = 1; j <= 9; j++) {
+                tableTemplateConfig[j] = tableData[j-1] === 0 ? '' : tableData[j-1];
+            }
+
+            var tableTemplate = $(Sudoku.templates["Sudoku3x3Table"](tableTemplateConfig));
+            addClassToInitialDataValue(tableTemplate, tableData);
+
+            sudokuBoardTemplate.find('[data-table="' + i + '"]').append(tableTemplate);
+        }
+
+        // Makes the overall board the delegator of the click event inside the board.
+        // Targets all the subsquares that don't have an initial value in them.
+        sudokuBoardTemplate.on("click", ".sudoku-3x3-table td:not(.initialDataValue)", subSquareClickHandler);
+
+        _board = sudokuBoardTemplate;
+        return sudokuBoardTemplate;
+    }
+
+    return {
+        generateBoard: generateBoard
     };
 }();
 /*
@@ -133,6 +291,11 @@ var SudokuChecker = function() {
         });
     }
 
+    /**
+     * Returns the array without empty values.
+     * @param arr {Array} - an array of values.
+     * @return {Array} - ar array of non empty values.
+     */
     function getNonEmptyValuesIn(arr) {
         return arr.filter(function(value) {
             return !!value;
@@ -140,8 +303,8 @@ var SudokuChecker = function() {
     }
 
     /**
-     * Returns an array containing all the values in the sub squares.
-     * @param subSquares {Array} - sub squares in the Sudoku board.
+     * Returns an array containing all the values in the sub-squares.
+     * @param subSquares {Array} - sub-squares in the Sudoku board.
      * @param includeEmpty {Boolean} - true if empty values should be considered as well.
      * @return {Array} - an array of values.
      */
@@ -155,6 +318,12 @@ var SudokuChecker = function() {
         return values;
     }
 
+    /**
+     * Checks if the sub-squares are complete and obeying rules.
+     * Add the sub-squares to subSquaresViolatingRules if sub-squares are violating the rules or
+     * add to subSquareObeyingRules otherwise.
+     * Turn isGameSolved to false if either violating rules or has empty values.
+     */
     function checkIfSubSquareCompleteAndObeyRules(subSquares, result) {
         if (isViolatingRules(subSquares)) {
             result.subSquaresViolatingRules = result.subSquaresViolatingRules.concat(subSquares);
@@ -197,9 +366,9 @@ var SudokuChecker = function() {
     }
 
     /**
-     * Returns true if the sub squares are complete (no empty values) and not violating rules.
-     * @param subSquares {Array} - array of sub squares.
-     * @return {Boolean} - Returns true if the sub squares are complete (no empty values)
+     * Returns true if the sub-squares are complete (no empty values) and not violating rules.
+     * @param subSquares {Array} - array of sub-squares.
+     * @return {Boolean} - Returns true if the sub-squares are complete (no empty values)
      *                     and not violating rules, false otherwise.
      */
     function isComplete(subSquares) {
@@ -208,9 +377,9 @@ var SudokuChecker = function() {
     }
 
     /**
-     * Returns true if at least one value in the sub squares is duplicated (violating the game rules).
+     * Returns true if at least one value in the sub-squares is duplicated (violating the game rules).
      * This function can be used to check for rows, columns, and sub 3x3 tables.
-     * @param subSquares {Array} - sub squares in the Sudoku board.
+     * @param subSquares {Array} - sub-squares in the Sudoku board.
      * @return {Boolean} - true if all the values in the array are unique, false otherwise.
      */
     function isViolatingRules(subSquares) {
@@ -260,11 +429,11 @@ var SudokuUtils = function() {
     }
 
     /**
-     * Returns all the sub squares in the given board row and sub table row in the board.
+     * Returns all the sub-squares in the given board row and sub table row in the board.
      * @param board {jQuery Object} - current state of the board.
      * @param boardRow {String} - the row number in the board, is between 1 - 3.
      * @param subTableRow {String} - the row number in the sub 3x3 table, is between 1 - 3.
-     * @return {Array} - an array of sub squares.
+     * @return {Array} - an array of sub-squares.
      */
     function rowSubSquaresSelector(board, boardRow, subTableRow) {
         var query = rowValuesQueryGenerator(boardRow, subTableRow);
@@ -272,11 +441,11 @@ var SudokuUtils = function() {
     }
 
     /**
-     * Returns all the sub squares in the given board column and sub table column in the board.
+     * Returns all the sub-squares in the given board column and sub table column in the board.
      * @param board {jQuery Object} - current state of the board.
      * @param boardRow {String} - the column number in the board, is between 1 - 3.
      * @param subTableRow {String} - the column number in the sub 3x3 table, is between 1 - 3.
-     * @return {Array} - an array of sub squares.
+     * @return {Array} - an array of sub-squares.
      */
     function columnSubSquaresSelector(board, boardColumn, subTableColumn) {
         var query = columnValuesQueryGenerator(boardColumn, subTableColumn);
@@ -284,10 +453,10 @@ var SudokuUtils = function() {
     }
 
     /**
-     * Returns all the sub squares in the given sub table number in the board.
+     * Returns all the sub-squares in the given sub table number in the board.
      * @param board {jQuery Object} - current state of the board.
      * @param tableNum {String} - the table number in the board, is between 1 - 9.
-     * @return {Array} - an array of sub squares.
+     * @return {Array} - an array of sub-squares.
      */
     function tableSubSquaresSelector(board, tableNum) {
         var query = tableValuesQueryGenerator(tableNum);
@@ -352,147 +521,5 @@ var SudokuUtils = function() {
         rowSubSquaresSelector       : rowSubSquaresSelector,
         columnSubSquaresSelector    : columnSubSquaresSelector,
         tableSubSquaresSelector     : tableSubSquaresSelector
-    };
-}();
-var SudokuBoard = function() {
-    // Cache the board for selection use later.
-    var _board;
-
-    var sudokuContainerId = "#sudoku-container";
-    // Class for the initial data value.
-    var initialDataValueClass = "initialDataValue";
-
-    // variables needed to distinguish between single click and double clicks.
-    var _click = 0;
-    var DELAY = 180;
-    var _timer = null;
-
-    /**
-     * Add a class to all the initial data values, so that we can
-     * add style to them to differentiate from the guess values.
-     * @param template {jQuery Object} - the 3x3 sudoku template.
-     */
-    function addClassToInitialDataValue(template, tableData) {
-        template.find('td').each(function(index, value) {
-            if (tableData[index] !== 0) {
-                $(value).addClass(initialDataValueClass);
-            } 
-        });
-    }
-
-    /**
-     * Turns on/off the class based on the toggle value. If yes, add the class to the subsquare,
-     * remove it otherwise.
-     * @param subSquares {Array} - array of sub squares.
-     * @param toggle {Boolean} - true then add the class to the sub squares, remove the class otherwise.
-     */
-    function toggleClass(subSquares, toggle) {
-        var violatingRulesClass = 'violatingRules';
-        subSquares.forEach(function(subSquare, index) {
-            var $subSquare = $(subSquare);
-            if (!$subSquare.hasClass('initialDataValue') && $subSquare.text()) {
-                $(subSquare).toggleClass(violatingRulesClass, toggle);
-            }
-        });
-    }
-
-    /**
-     * Sub square click handler. This handler finds out the row and column data about the 
-     * sub square and generates the guess options for the player to guess from.
-     * @param evt {jQuery Object} - jQuery event object.
-     */
-    function subSquareSingleClickHandler(evt) {
-        // Put the guess value into the corresponding sub square.
-        // Removes the outline surrounding the selected sub square.
-        function onGuessValueSelected(guessValue) {
-            var hasValueChanged = guessValue !== parseInt(target.text(), 10);
-
-            target.removeClass('selected')
-                .text(guessValue);
-
-            target.addClass('hasGuessValue');
-
-            if (hasValueChanged) {
-                var results = SudokuChecker.checkIfGameSolved(_board);
-                toggleClass(results.subSquareObeyingRules, false);
-                toggleClass(results.subSquaresViolatingRules, true);
-                
-                if (results.isGameSolved) {
-                    
-                }
-            }
-        }
-
-        // Removes the outline surrounding the selected sub square.
-        function onDismissed() {
-            target.removeClass('selected');
-        }
-
-        var target = $(evt.target);
-        target.addClass('selected');
-        var rowColumnData = SudokuUtils.geRowColumnDataBasedOn(target);
-        // Get all the values that are not available to choose from.
-        var initialValues = SudokuUtils.getInitialValuesBasedOn(_board, rowColumnData);
-        GuessValuesWidget.show(initialValues).then(onGuessValueSelected, onDismissed);
-    }
-
-    function subSquareDoubleClickHandler(evt) {
-        var target = $(evt.target);
-        var targetValue = target.text();
-        if (targetValue) {
-            target.text('');
-            target.removeClass('hasGuessValue');
-            var results = SudokuChecker.checkIfGameSolved(_board);
-            toggleClass(results.subSquareObeyingRules, false);
-            toggleClass(results.subSquaresViolatingRules, true);
-        }
-    }
-
-    function subSquareClickHandler(evt) {
-        _click++;
-
-        if (_click === 1) {
-            _timer = setTimeout(function() {
-                subSquareSingleClickHandler(evt);
-                _click = 0;
-            }, DELAY);
-        } else {
-            clearTimeout(_timer);
-            subSquareDoubleClickHandler(evt);
-            _click = 0;
-        }
-    }
-    
-    /**
-     * Generates the sudoku board.
-     */
-    function generateBoard() {
-        var sudokuBoardTemplate = $(Sudoku.templates["SudokuBoard"]());
-        var boardData = SudokuBoardData.generateBoardData();
-
-        for (var i = 1; i <= 9; i++) {
-            var tableData = boardData[i-1];
-            var tableTemplateConfig = {};
-
-            for (var j = 1; j <= 9; j++) {
-                tableTemplateConfig[j] = tableData[j-1] === 0 ? '' : tableData[j-1];
-            }
-
-            var tableTemplate = $(Sudoku.templates["Sudoku3x3Table"](tableTemplateConfig));
-            addClassToInitialDataValue(tableTemplate, tableData);
-
-            sudokuBoardTemplate.find('[data-table="' + i + '"]').append(tableTemplate);
-        }
-
-        // Makes the overall board the delegator of the click event inside the board.
-        // Targets all the subsquares that don't have an initial value in them.
-        sudokuBoardTemplate.on("click", ".sudoku-3x3-table td:not(.initialDataValue)", subSquareClickHandler);
-
-        _board = sudokuBoardTemplate;
-        $(sudokuContainerId).append(sudokuBoardTemplate);
-    }
-
-    return {
-        generateBoard: generateBoard
     };
 }();

@@ -64,3 +64,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
   return "<table class=\"sudoku-board\">\n    <tr>\n        <td data-board-row=\"1\" data-board-column=\"1\" data-table=\"1\"></td>\n        <td data-board-row=\"1\" data-board-column=\"2\" data-table=\"2\"></td>\n        <td data-board-row=\"1\" data-board-column=\"3\" data-table=\"3\"></td>\n    </tr>\n    <tr>\n        <td data-board-row=\"2\" data-board-column=\"1\" data-table=\"4\"></td>\n        <td data-board-row=\"2\" data-board-column=\"2\" data-table=\"5\"></td>\n        <td data-board-row=\"2\" data-board-column=\"3\" data-table=\"6\"></td>\n    </tr>\n    <tr>\n        <td data-board-row=\"3\" data-board-column=\"1\" data-table=\"7\"></td>\n        <td data-board-row=\"3\" data-board-column=\"2\" data-table=\"8\"></td>\n        <td data-board-row=\"3\" data-board-column=\"3\" data-table=\"9\"></td>\n    </tr>\n</table>";
   });
+
+this["Sudoku"]["templates"]["SudokuInstruction"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div class=\"sudoku-instruction\">\n    <p>Double click to remove your guess</p>\n</div>";
+  });
