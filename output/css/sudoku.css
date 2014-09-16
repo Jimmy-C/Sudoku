@@ -26,6 +26,16 @@ body {
   text-align: center;
 }
 
+.guess-values-widget .overlay {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  background-color: black;
+  z-index: 900;
+}
+
 .guess-values-menu {
   position: relative;
   top: -30px;
@@ -89,14 +99,61 @@ body {
   background-clip: padding-box;
 }
 
-.overlay {
+.sudoku-game-solved-banner {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  height: 100%;
+  webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.sudoku-game-solved-banner .overlay {
   position: fixed;
   top: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.5;
+  opacity: 0.6;
   background-color: black;
   z-index: 900;
+}
+
+.sudoku-banner-container {
+  position: relative;
+  top: 33%;
+  height: 33%;
+  width: 100%;
+  text-align: center;
+  background-color: white;
+  color: #707070;
+  z-index: 1000;
+}
+
+.sudoku-new-game-container {
+  width: 100%;
+  height: 100%;
+}
+
+.sudoku-new-game-button {
+  width: 250px;
+  height: 60px;
+  margin: 0 auto;
+  margin-top: 50px;
+  outline: none;
+  color: #007ee5;
+  background-color: white;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+.sudoku-banner {
+  width: 100%;
+  font-size: 7em;
 }
 
 .sudoku-board {

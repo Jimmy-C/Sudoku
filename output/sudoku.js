@@ -10,6 +10,27 @@ var GuessValuesWidget = function() {
     var menuItemClass = ".guess-value";
     var overlayClass = ".overlay";
 
+    var _GuessValuesWidgetPubSub = null;
+
+    var Public_Events = {
+        Guess_value : "guess_value",
+        Dismissed   : "dismissed"
+    }
+
+    /**
+     * Let other modules to subscribe to this module's event;
+     */
+    function subscribeEvent(name, callback) {
+        _GuessValuesWidgetPubSub.subscribe(name, callback);
+    }
+
+    /**
+     * Let other modules to unsubscribe to this module's event;
+     */
+    function unsubscribeEvent(name) {
+        _GuessValuesWidgetPubSub.unsubscribe(name);
+    }
+
     /**
      * Shows the widget, returns a deferred and wait for the player input.
      * The menu that contains the numbers to choose from will be located below the board.
@@ -23,20 +44,19 @@ var GuessValuesWidget = function() {
     function show(values) {
         // To dismiss the widget.
         function overlayClickHandler(evt) {
-            widgetDeferred.reject("Widget dismissed.");
             guessValueWidget.remove();
+            _GuessValuesWidgetPubSub.publish(Public_Events.Dismissed);
         }
         // Get the number and resolve the deferred with the number.
         function guessValueSquareClickHandler(evt) {
             var target = $(evt.target);
             var guessValue = parseInt(target.text(), 10);
-
-            widgetDeferred.resolve(guessValue);
             guessValueWidget.remove();
+            _GuessValuesWidgetPubSub.publish(Public_Events.Guess_value, guessValue);
         }
 
+        _GuessValuesWidgetPubSub = new PubSub();
         var guessValueWidget = $(Sudoku.templates["GuessValuesWidget"]());
-        var widgetDeferred = $.Deferred();
 
         guessValueWidget.find(menuClass)
             .click(guessValueSquareClickHandler)
@@ -48,18 +68,41 @@ var GuessValuesWidget = function() {
 
         guessValueWidget.find(overlayClass).click(overlayClickHandler);
         $(sudokuContainerId).append(guessValueWidget);
-        return widgetDeferred;
     }
 
     return {
-        show : show
+        show : show,
+        subscribeEvent : subscribeEvent,
+        unsubscribeEvent : unsubscribeEvent,
+        Public_Events  : Public_Events
     };
 }();
 var SudokuApp = function() {
     var sudokuContainerId = "#sudoku-container";
 
+    /**
+     * Shows the game solved banner. Set up a new game if the player elects to.
+     */
+    function gameSolvedHandler() {
+        SudokuEndOfGameBannerWidget.showBanner();
+        SudokuEndOfGameBannerWidget.subscribeEvent(SudokuEndOfGameBannerWidget.Public_Events.New_game, newGameHandler);
+    } 
+
+    /**
+     * new game handler. Sets up a new board.
+     */
+    function newGameHandler() {
+        SudokuBoard.destroy();
+        $(sudokuContainerId).empty();
+        createBoard();
+    }
+
+    /**
+     * Creates a sudoku board with a instruction underneath.
+     */
     function createBoard() {
         var board = SudokuBoard.generateBoard();
+        SudokuBoard.subscribeEvent(SudokuBoard.Public_Events.Game_solved, gameSolvedHandler);
 
         var instructionTemplate = $(Sudoku.templates["SudokuInstruction"]());
         $(sudokuContainerId).append(board)
@@ -72,7 +115,7 @@ var SudokuApp = function() {
 }();
 var SudokuBoard = function() {
     // Cache the board for selection use later.
-    var _board;
+    var _board = null;
 
     // Class for the initial data value.
     var initialDataValueClass = "initialDataValue";
@@ -81,6 +124,11 @@ var SudokuBoard = function() {
     var _click = 0;
     var DELAY = 180;
     var _timer = null;
+
+    var _SudokuBoardPubSub = null;
+    var Public_Events = {
+        Game_solved : "game_solved"
+    }
 
     /**
      * Add a class to all the initial data values, so that we can
@@ -133,8 +181,8 @@ var SudokuBoard = function() {
                 toggleClass(results.subSquareObeyingRules, false);
                 toggleClass(results.subSquaresViolatingRules, true);
                 
-                if (results.isGameSolved) {
-                    //TODO Implement end of game celebration.
+                if (true || results.isGameSolved) {
+                    _SudokuBoardPubSub.publish(Public_Events.Game_solved);
                 }
             }
         }
@@ -149,7 +197,9 @@ var SudokuBoard = function() {
         var rowColumnData = SudokuUtils.geRowColumnDataBasedOn(target);
         // Get all the values that are not available to choose from.
         var initialValues = SudokuUtils.getInitialValuesBasedOn(_board, rowColumnData);
-        GuessValuesWidget.show(initialValues).then(onGuessValueSelected, onDismissed);
+        GuessValuesWidget.show(initialValues);
+        GuessValuesWidget.subscribeEvent(GuessValuesWidget.Public_Events.Dismissed, onDismissed);
+        GuessValuesWidget.subscribeEvent(GuessValuesWidget.Public_Events.Guess_value, onGuessValueSelected);
     }
 
     /**
@@ -188,12 +238,35 @@ var SudokuBoard = function() {
             _click = 0;
         }
     }
+
+    /**
+     * Let other modules to subscribe to this module's event;
+     */
+    function subscribeEvent(name, callback) {
+        _SudokuBoardPubSub.subscribe(name, callback);
+    }
+
+    /**
+     * Let other modules to unsubscribe to this module's event;
+     */
+    function unsubscribeEvent(name) {
+        _SudokuBoardPubSub.unsubscribe(name);
+    }
+
+    /**
+     * Cleans up the current board.
+     */
+    function destroy() {
+        _board = null;
+        _SudokuBoardPubSub = null;
+    }
     
     /**
      * Generates the sudoku board and returns the board.
      * @return {jQuery Object} - the representation of the board.
      */
     function generateBoard() {
+        _SudokuBoardPubSub = new PubSub();
         var sudokuBoardTemplate = $(Sudoku.templates["SudokuBoard"]());
         var boardData = SudokuBoardData.generateBoardData();
 
@@ -220,7 +293,11 @@ var SudokuBoard = function() {
     }
 
     return {
-        generateBoard: generateBoard
+        generateBoard : generateBoard,
+        destroy       : destroy,
+        subscribeEvent : subscribeEvent,
+        Public_Events  : Public_Events,
+        unsubscribeEvent : unsubscribeEvent
     };
 }();
 /*
@@ -390,6 +467,74 @@ var SudokuChecker = function() {
     return {
         checkIfGameSolved : checkIfGameSolved,
         isViolatingRules : isViolatingRules
+    };
+}();
+/**
+ * SudokuEndOfGameBannerWidget is responsible for showing the game solved banner,
+ * signals the app the generate a new board if the player elects to.
+ */
+var SudokuEndOfGameBannerWidget = function() {
+    var _SudokuEndOfGameBannerPubSub = null;
+    var _sudokuEndOfGameBannerWidget;
+
+    var Public_Events = {
+        New_game : "new_game"
+    }
+
+    /**
+     * Pick a random text to display in the banner.
+     */
+    function sudokuGameSolvedBannerTextGenerator() {
+        var textStrings = ["Congratulation!", "Well done!", "You're awesome!"];
+        var randomIndex = Math.floor(Math.random() * (textStrings.length - 0));
+        return textStrings[randomIndex];
+    }
+
+    /**
+     * Signals the app to generate a new board.
+     */
+    function newGameClickHandler(evt) {
+        _sudokuEndOfGameBannerWidget.remove();
+        _SudokuEndOfGameBannerPubSub.publish(Public_Events.New_game);
+    }
+
+    /**
+     * Let other modules to subscribe to this module's event;
+     */
+    function subscribeEvent(name, callback) {
+        _SudokuEndOfGameBannerPubSub.subscribe(name, callback);
+    }
+
+    /**
+     * Let other modules to unsubscribe to this module's event;
+     */
+    function unsubscribeEvent(name) {
+        _SudokuEndOfGameBannerPubSub.unsubscribe(name);
+    }
+
+    /**
+     * Shows the banner.
+     */
+    function showBanner() {
+        _SudokuEndOfGameBannerPubSub = new PubSub();
+        var config = {
+            sudokuBannerText : sudokuGameSolvedBannerTextGenerator()
+        };
+        _sudokuEndOfGameBannerWidget = $(Sudoku.templates["SudokuGameSolvedBanner"](config));
+        _sudokuEndOfGameBannerWidget.find('.sudoku-new-game-button').click(newGameClickHandler);
+        $('body').append(_sudokuEndOfGameBannerWidget);
+        
+        // Because the height of the banner is based on the height of the screen, we need to wait
+        // until the height is determined to set the line-height;
+        var bannerContainerHeight = $(".sudoku-banner-container").height();
+        $(".sudoku-banner").css('line-height', bannerContainerHeight + "px");
+    }
+
+    return {
+        showBanner : showBanner,
+        subscribeEvent : subscribeEvent,
+        unsubscribeEvent: unsubscribeEvent,
+        Public_Events: Public_Events
     };
 }();
 /**

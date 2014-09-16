@@ -9,6 +9,27 @@ var GuessValuesWidget = function() {
     var menuItemClass = ".guess-value";
     var overlayClass = ".overlay";
 
+    var _GuessValuesWidgetPubSub = null;
+
+    var Public_Events = {
+        Guess_value : "guess_value",
+        Dismissed   : "dismissed"
+    }
+
+    /**
+     * Let other modules to subscribe to this module's event;
+     */
+    function subscribeEvent(name, callback) {
+        _GuessValuesWidgetPubSub.subscribe(name, callback);
+    }
+
+    /**
+     * Let other modules to unsubscribe to this module's event;
+     */
+    function unsubscribeEvent(name) {
+        _GuessValuesWidgetPubSub.unsubscribe(name);
+    }
+
     /**
      * Shows the widget, returns a deferred and wait for the player input.
      * The menu that contains the numbers to choose from will be located below the board.
@@ -22,20 +43,19 @@ var GuessValuesWidget = function() {
     function show(values) {
         // To dismiss the widget.
         function overlayClickHandler(evt) {
-            widgetDeferred.reject("Widget dismissed.");
             guessValueWidget.remove();
+            _GuessValuesWidgetPubSub.publish(Public_Events.Dismissed);
         }
         // Get the number and resolve the deferred with the number.
         function guessValueSquareClickHandler(evt) {
             var target = $(evt.target);
             var guessValue = parseInt(target.text(), 10);
-
-            widgetDeferred.resolve(guessValue);
             guessValueWidget.remove();
+            _GuessValuesWidgetPubSub.publish(Public_Events.Guess_value, guessValue);
         }
 
+        _GuessValuesWidgetPubSub = new PubSub();
         var guessValueWidget = $(Sudoku.templates["GuessValuesWidget"]());
-        var widgetDeferred = $.Deferred();
 
         guessValueWidget.find(menuClass)
             .click(guessValueSquareClickHandler)
@@ -47,10 +67,12 @@ var GuessValuesWidget = function() {
 
         guessValueWidget.find(overlayClass).click(overlayClickHandler);
         $(sudokuContainerId).append(guessValueWidget);
-        return widgetDeferred;
     }
 
     return {
-        show : show
+        show : show,
+        subscribeEvent : subscribeEvent,
+        unsubscribeEvent : unsubscribeEvent,
+        Public_Events  : Public_Events
     };
 }();

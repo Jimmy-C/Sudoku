@@ -1,6 +1,6 @@
 var SudokuBoard = function() {
     // Cache the board for selection use later.
-    var _board;
+    var _board = null;
 
     // Class for the initial data value.
     var initialDataValueClass = "initialDataValue";
@@ -9,6 +9,11 @@ var SudokuBoard = function() {
     var _click = 0;
     var DELAY = 180;
     var _timer = null;
+
+    var _SudokuBoardPubSub = null;
+    var Public_Events = {
+        Game_solved : "game_solved"
+    }
 
     /**
      * Add a class to all the initial data values, so that we can
@@ -61,8 +66,8 @@ var SudokuBoard = function() {
                 toggleClass(results.subSquareObeyingRules, false);
                 toggleClass(results.subSquaresViolatingRules, true);
                 
-                if (results.isGameSolved) {
-                    //TODO Implement end of game celebration.
+                if (true || results.isGameSolved) {
+                    _SudokuBoardPubSub.publish(Public_Events.Game_solved);
                 }
             }
         }
@@ -77,7 +82,9 @@ var SudokuBoard = function() {
         var rowColumnData = SudokuUtils.geRowColumnDataBasedOn(target);
         // Get all the values that are not available to choose from.
         var initialValues = SudokuUtils.getInitialValuesBasedOn(_board, rowColumnData);
-        GuessValuesWidget.show(initialValues).then(onGuessValueSelected, onDismissed);
+        GuessValuesWidget.show(initialValues);
+        GuessValuesWidget.subscribeEvent(GuessValuesWidget.Public_Events.Dismissed, onDismissed);
+        GuessValuesWidget.subscribeEvent(GuessValuesWidget.Public_Events.Guess_value, onGuessValueSelected);
     }
 
     /**
@@ -116,12 +123,35 @@ var SudokuBoard = function() {
             _click = 0;
         }
     }
+
+    /**
+     * Let other modules to subscribe to this module's event;
+     */
+    function subscribeEvent(name, callback) {
+        _SudokuBoardPubSub.subscribe(name, callback);
+    }
+
+    /**
+     * Let other modules to unsubscribe to this module's event;
+     */
+    function unsubscribeEvent(name) {
+        _SudokuBoardPubSub.unsubscribe(name);
+    }
+
+    /**
+     * Cleans up the current board.
+     */
+    function destroy() {
+        _board = null;
+        _SudokuBoardPubSub = null;
+    }
     
     /**
      * Generates the sudoku board and returns the board.
      * @return {jQuery Object} - the representation of the board.
      */
     function generateBoard() {
+        _SudokuBoardPubSub = new PubSub();
         var sudokuBoardTemplate = $(Sudoku.templates["SudokuBoard"]());
         var boardData = SudokuBoardData.generateBoardData();
 
@@ -148,6 +178,10 @@ var SudokuBoard = function() {
     }
 
     return {
-        generateBoard: generateBoard
+        generateBoard : generateBoard,
+        destroy       : destroy,
+        subscribeEvent : subscribeEvent,
+        Public_Events  : Public_Events,
+        unsubscribeEvent : unsubscribeEvent
     };
 }();
