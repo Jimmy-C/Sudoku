@@ -34,10 +34,13 @@
     &.initialDataValue {
         color: $font-color-initial;
         cursor: default;
+
+        @include animation(opacity, 2s, 1);
     }
 
     &.hasGuessValue {
         color: $royal-blue;
+        @include transition(all, 0.2s, ease-in);
     }
 
     &.violatingRules:not(.initialDataValue) {

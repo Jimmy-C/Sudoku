@@ -22,4 +22,8 @@ body {
     font-size: $font-size-medium;
     font-weight: $font-weight-normal;
     text-align: center;
+    @include animation(opacity, 2s, 1);
 }
+
+@include keyframes-opacity();
+@include keyframes-fadeInLeft();

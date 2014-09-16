@@ -24,6 +24,102 @@ body {
   font-size: 1.5em;
   font-weight: 400;
   text-align: center;
+  -webkit-animation: opacity 2s 1;
+  /* Safari 4+ */
+  -moz-animation: opacity 2s 1;
+  /* Fx 5+ */
+  -o-animation: opacity 2s 1;
+  /* Opera 12+ */
+  animation: opacity 2s 1;
+  /* IE 10+, Fx 29+ */
+}
+
+@-webkit-keyframes opacity {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes opacity {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@-ms-keyframes opacity {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes opacity {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeInLeft {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateX(-40px);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateX(0);
+  }
+}
+
+@-moz-keyframes fadeInLeft {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateX(-40px);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateX(0);
+  }
+}
+
+@-ms-keyframes fadeInLeft {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateX(-40px);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateX(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .guess-values-widget .overlay {
@@ -132,6 +228,14 @@ body {
   background-color: white;
   color: #707070;
   z-index: 1000;
+  -webkit-animation: fadeInLeft 1.5s 1;
+  /* Safari 4+ */
+  -moz-animation: fadeInLeft 1.5s 1;
+  /* Fx 5+ */
+  -o-animation: fadeInLeft 1.5s 1;
+  /* Opera 12+ */
+  animation: fadeInLeft 1.5s 1;
+  /* IE 10+, Fx 29+ */
 }
 
 .sudoku-new-game-container {
@@ -199,9 +303,21 @@ body {
 .sudoku-3x3-table td.initialDataValue {
   color: #464646;
   cursor: default;
+  -webkit-animation: opacity 2s 1;
+  /* Safari 4+ */
+  -moz-animation: opacity 2s 1;
+  /* Fx 5+ */
+  -o-animation: opacity 2s 1;
+  /* Opera 12+ */
+  animation: opacity 2s 1;
+  /* IE 10+, Fx 29+ */
 }
 .sudoku-3x3-table td.hasGuessValue {
   color: #007ee5;
+  -webkit-transition: all 0.2s ease-in;
+  -moz-transition: all 0.2s ease-in;
+  -ms-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
 }
 .sudoku-3x3-table td.violatingRules:not(.initialDataValue) {
   color: #eb2b36;

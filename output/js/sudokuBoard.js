@@ -66,7 +66,7 @@ var SudokuBoard = function() {
                 toggleClass(results.subSquareObeyingRules, false);
                 toggleClass(results.subSquaresViolatingRules, true);
                 
-                if (results.isGameSolved) {
+                if (true || results.isGameSolved) {
                     _SudokuBoardPubSub.publish(Public_Events.Game_solved);
                 }
             }

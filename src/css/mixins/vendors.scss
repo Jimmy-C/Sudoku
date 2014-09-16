@@ -43,3 +43,79 @@
     -ms-user-select: none;
     user-select: none;
 }
+
+@mixin transition($property, $duration, $effect) {
+    -webkit-transition: $property $duration $effect;
+    -moz-transition: $property $duration $effect;
+    -ms-transition: $property $duration $effect;
+    transition: $property $duration $effect;
+}
+
+@mixin keyframes-opacity() {
+    @-webkit-keyframes opacity {
+        0%   { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    @-moz-keyframes opacity {
+        0%   { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    @-ms-keyframes opacity {
+        0%   { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    @keyframes opacity {
+        0%   { opacity: 0; }
+        100% { opacity: 1; }
+    }
+}
+
+@mixin keyframes-fadeInLeft() {
+    @-webkit-keyframes fadeInLeft { 
+        0% { 
+            opacity: 0; 
+            -webkit-transform: translateX(-40px); 
+        } 
+        100% { 
+            opacity: 1; 
+            -webkit-transform: translateX(0); 
+        } 
+    }
+    @-moz-keyframes fadeInLeft { 
+        0% { 
+            opacity: 0; 
+            -webkit-transform: translateX(-40px); 
+        } 
+        100% { 
+            opacity: 1; 
+            -webkit-transform: translateX(0); 
+        } 
+    }
+    @-ms-keyframes fadeInLeft { 
+        0% { 
+            opacity: 0; 
+            -webkit-transform: translateX(-40px); 
+        } 
+        100% { 
+            opacity: 1; 
+            -webkit-transform: translateX(0); 
+        } 
+    } 
+    @keyframes fadeInLeft { 
+        0% { 
+            opacity: 0; 
+            transform: translateX(-20px); 
+        } 
+        100% { 
+            opacity: 1; 
+            transform: translateX(0); 
+        } 
+    }
+}
+
+@mixin animation($keyFrameName, $duration, $repeat) {
+    -webkit-animation: $keyFrameName $duration $repeat; /* Safari 4+ */
+    -moz-animation:    $keyFrameName $duration $repeat; /* Fx 5+ */
+    -o-animation:      $keyFrameName $duration $repeat; /* Opera 12+ */
+    animation:         $keyFrameName $duration $repeat; /* IE 10+, Fx 29+ */
+}
