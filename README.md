@@ -7,7 +7,7 @@ This is a web based sudoku game written in HTML5, CSS3, and JavaScript developed
 #####SudokuChecker : Responsible for checking if the board is solved, if not, figures out what sub squares are violating the rules.  
 #####GuessValuesWidget : A UI widget for the player to pick a number.  
 #####SudokuEndOfGameBannerWidget : An acorss the monitor widget congratulating the player for beating the game, also asks if the player wants to play a new game.  
-#####SudokuUtils : Several util functions for retriving the data values in the board.  
+#####SudokuUtils : Several util functions for retriving the data values in the board.
 
 ##Technologies used:
 #####Handlebars : The templating library for generating reusable html templates. The reason behind choosing Handlebars was because this is the templating library that I'm most familiar with and is simple but powerful enough to serve the need of this application.
@@ -20,3 +20,6 @@ This is a web based sudoku game written in HTML5, CSS3, and JavaScript developed
 #####Build a double tap event handler for mobile devices, so that the player can double tap to remove their guess number.
 #####Clean up the grunt file a little bit to reduce redunency.
 #####Have more than just one board.
+
+##Note:
+#####debug and dist build are committed into the repository for demo purposes.
