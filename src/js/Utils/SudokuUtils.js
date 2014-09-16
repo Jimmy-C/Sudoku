@@ -69,6 +69,14 @@ var SudokuUtils = function() {
         return board.find(query).toArray();
     }
 
+    function geRowColumnDataBasedOn(target) {
+        var subSquare = $(target);
+        var subSquareData = subSquare.data();
+        var subSquareParentData = $(subSquare.parents('[data-table]')).data();
+        var rowColumnData = $.extend({}, subSquareData, subSquareParentData);
+        return rowColumnData;
+    }
+
     /**
      * Returns the sorted unique initial values based on the board and sub table's row/column data.
      * For example, for boardColumn = 1, subTableColumn = 3, boardRow = 1, subTableRow = 1, table = 1,
@@ -115,6 +123,7 @@ var SudokuUtils = function() {
      */
     return {
         getInitialValuesBasedOn     : getInitialValuesBasedOn,
+        geRowColumnDataBasedOn      : geRowColumnDataBasedOn,
         rowSubSquaresSelector       : rowSubSquaresSelector,
         columnSubSquaresSelector    : columnSubSquaresSelector,
         tableSubSquaresSelector     : tableSubSquaresSelector

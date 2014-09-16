@@ -42,6 +42,8 @@
     &.violatingRules:not(.initialDataValue) {
         color: $royal-red;
     }
+
+    @include user-select-off();
 }
 
 td[data-sub-table-row="1"] {

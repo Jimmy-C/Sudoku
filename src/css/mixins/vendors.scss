@@ -35,3 +35,11 @@
     border-bottom-right-radius: $radius;
     background-clip: padding-box;
 }
+
+@mixin user-select-off() {
+    webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

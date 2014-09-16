@@ -109,6 +109,11 @@ body {
   color: #007ee5;
   cursor: pointer;
   box-sizing: border-box;
+  webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .sudoku-3x3-table td:not(.initialDataValue):hover {
   background-color: #e1e1e1;

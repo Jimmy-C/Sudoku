@@ -15,8 +15,20 @@ var SudokuChecker = function() {
         }); 
     }
 
+    /**
+     * Returns true if the arr does not have empty values, false otherwise.
+     * @param arr {Array} - array of values.
+     * @return {Boolean} - returns true if the array does not contain empty values,
+     *                     false otherwise.
+     */
     function hasNoEmptyValues(arr) {
         return arr.every(function(value, index) {
+            return !!value;
+        });
+    }
+
+    function getNonEmptyValuesIn(arr) {
+        return arr.filter(function(value) {
             return !!value;
         });
     }
@@ -37,36 +49,56 @@ var SudokuChecker = function() {
         return values;
     }
 
+    function checkIfSubSquareCompleteAndObeyRules(subSquares, result) {
+        if (isViolatingRules(subSquares)) {
+            result.subSquaresViolatingRules = result.subSquaresViolatingRules.concat(subSquares);
+            result.isGameSolved = false;
+        } else {
+            result.subSquareObeyingRules = result.subSquareObeyingRules.concat(subSquares);
+            if (!isComplete(subSquares)) {
+                result.isGameSolved = false;
+            }
+        }
+    }
+
     /**
      * Returns true if the game is solved, false otherwise.
      * @param board {jQuery Object} - current state of the board.
      * @return {Boolean} - true if the game is solved, false otherwise.
      */
-    function isGameSolved(board) {
+    function checkIfGameSolved(board) {
+        var result = {
+            subSquaresViolatingRules : [],
+            subSquareObeyingRules    : [],
+            isGameSolved : true
+        };
         // Check all the board rows and columns.
         for (var i = 1; i <= 3; i++) {
             for (var j = 1; j <=3; j++) {
                 var rowSubSquares = SudokuUtils.rowSubSquaresSelector(board, i, j);
                 var columnSubSquares = SudokuUtils.columnSubSquaresSelector(board, i, j);
-                if (!isCompleteAndNotViolatingRules(rowSubSquares) || !isCompleteAndNotViolatingRules(columnSubSquares)) {
-                    return false;
-                }
+                checkIfSubSquareCompleteAndObeyRules(rowSubSquares, result);
+                checkIfSubSquareCompleteAndObeyRules(columnSubSquares, result);
             }
         }
 
         // Check each individual table
         for (var tableNum = 1; tableNum <= 9; tableNum++) {
             var subTableSubSquares = SudokuUtils.tableSubSquaresSelector(board, tableNum);
-            if (!isCompleteAndNotViolatingRules(subTableSubSquares)){
-                return false;
-            }
+            checkIfSubSquareCompleteAndObeyRules(subTableSubSquares, result);
         }
-        return true;
+        return result;
     }
 
-    function isCompleteAndNotViolatingRules(subSquares) {
+    /**
+     * Returns true if the sub squares are complete (no empty values) and not violating rules.
+     * @param subSquares {Array} - array of sub squares.
+     * @return {Boolean} - Returns true if the sub squares are complete (no empty values)
+     *                     and not violating rules, false otherwise.
+     */
+    function isComplete(subSquares) {
         var values = getValuesFromSubSquare(subSquares, true);
-        return hasNoEmptyValues(values) && hasOnlyUniqueValues(values);
+        return hasNoEmptyValues(values);
     }
 
     /**
@@ -81,7 +113,7 @@ var SudokuChecker = function() {
     }
 
     return {
-        isGameSolved : isGameSolved,
+        checkIfGameSolved : checkIfGameSolved,
         isViolatingRules : isViolatingRules
     };
 }();
