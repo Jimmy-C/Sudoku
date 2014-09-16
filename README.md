@@ -22,6 +22,7 @@ This is a web based sudoku game written in HTML5, CSS3, and JavaScript developed
 #####Clean up the grunt file a little bit to reduce redunency.
 #####Have more than just one board.
 #####Investigate why Chrome is having some residual box-shadow color after the animation is over. Firefox and Safaris don't have this behavior.
+#####Optimize the row/column/sub table query selection process by using web workers, this could make the UI smoother.
 
 ##Note:
 #####debug and dist build are committed into the repository for demo purposes.
