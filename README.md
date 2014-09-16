@@ -26,3 +26,4 @@ This is a web based sudoku game written in HTML5, CSS3, and JavaScript developed
 
 ##Note:
 #####debug and dist build are committed into the repository for demo purposes.
+#####Guess value widget only displays options that will not conflict with the board's original values. This would make the game go a bit faster. However, it'd be a simple code change to display all options.
