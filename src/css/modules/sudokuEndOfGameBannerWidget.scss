@@ -52,5 +52,8 @@
 
 .sudoku-banner {
     width: 100%;
-    font-size: 7em;
+
+    @media screen and (max-width: $break-small) {
+        font-size: $font-size-very-large;
+    }
 }

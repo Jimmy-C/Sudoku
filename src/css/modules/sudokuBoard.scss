@@ -22,6 +22,12 @@
     box-sizing: border-box;
     font-size: $font-size-large;
 
+    @media screen and (max-width: $break-small) {
+        width: 30px;
+        height: 30px;
+        font-size: $font-size-medium;
+    }
+
     &:not(.initialDataValue):hover {
         background-color: $very-light-gray;
         background-clip: padding-box;

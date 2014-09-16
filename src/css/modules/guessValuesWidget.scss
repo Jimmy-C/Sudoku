@@ -19,6 +19,10 @@
     margin-right: auto;
     text-align: center;
     z-index: 1000;
+
+    @media screen and (max-width: $break-small) {
+        top: 20px;
+    }
 }
 
 .guess-value {
@@ -34,6 +38,12 @@
     color: $font-color-initial;
     font-size: $font-size-large;
     @include user-select-off();
+
+    @media screen and (max-width: $break-small) {
+        width: 30px;
+        height: 30px;
+        font-size: $font-size-medium;
+    }
 
     &:not(.notSelectable):hover {
         background-color: $very-light-gray;
