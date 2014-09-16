@@ -17,6 +17,12 @@ body {
   margin-bottom: 60px;
   height: 100%;
 }
+@media screen and (max-width: 640px) {
+  #sudoku-container {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+}
 
 .sudoku-instruction {
   margin-top: 30px;
@@ -32,6 +38,11 @@ body {
   /* Opera 12+ */
   animation: opacity 2s 1;
   /* IE 10+, Fx 29+ */
+}
+@media screen and (max-width: 640px) {
+  .sudoku-instruction {
+    display: none;
+  }
 }
 
 @-webkit-keyframes opacity {
@@ -89,31 +100,31 @@ body {
 @-moz-keyframes fadeInLeft {
   0% {
     opacity: 0;
-    -webkit-transform: translateX(-40px);
+    -moz-transform: translateX(-40px);
   }
 
   100% {
     opacity: 1;
-    -webkit-transform: translateX(0);
+    -moz-transform: translateX(0);
   }
 }
 
 @-ms-keyframes fadeInLeft {
   0% {
     opacity: 0;
-    -webkit-transform: translateX(-40px);
+    -ms-transform: translateX(-40px);
   }
 
   100% {
     opacity: 1;
-    -webkit-transform: translateX(0);
+    -ms-transform: translateX(0);
   }
 }
 
 @keyframes fadeInLeft {
   0% {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-40px);
   }
 
   100% {
@@ -142,6 +153,11 @@ body {
   text-align: center;
   z-index: 1000;
 }
+@media screen and (max-width: 640px) {
+  .guess-values-menu {
+    top: 20px;
+  }
+}
 
 .guess-value {
   display: inline-block;
@@ -160,6 +176,13 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+@media screen and (max-width: 640px) {
+  .guess-value {
+    width: 30px;
+    height: 30px;
+    font-size: 1.5em;
+  }
 }
 .guess-value:not(.notSelectable):hover {
   background-color: #e1e1e1;
@@ -259,6 +282,11 @@ body {
   width: 100%;
   font-size: 7em;
 }
+@media screen and (max-width: 640px) {
+  .sudoku-banner {
+    font-size: 3em;
+  }
+}
 
 .sudoku-board {
   margin: 0 auto;
@@ -292,6 +320,13 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+@media screen and (max-width: 640px) {
+  .sudoku-3x3-table td {
+    width: 30px;
+    height: 30px;
+    font-size: 1.5em;
+  }
 }
 .sudoku-3x3-table td:not(.initialDataValue):hover {
   background-color: #e1e1e1;
