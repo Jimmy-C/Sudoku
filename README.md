@@ -20,6 +20,7 @@ This is a web based sudoku game written in HTML5, CSS3, and JavaScript developed
 #####Build a double tap event handler for mobile devices, so that the player can double tap to remove their guess number.
 #####Clean up the grunt file a little bit to reduce redunency.
 #####Have more than just one board.
+#####to investigate why Chrome is having some residual box-shadow color after the animation is over. Firefox and Safaris don't have this behavior.
 
 ##Note:
 #####debug and dist build are committed into the repository for demo purposes.
