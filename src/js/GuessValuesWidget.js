@@ -58,7 +58,7 @@ var GuessValuesWidget = function() {
         var guessValueWidget = $(Sudoku.templates["GuessValuesWidget"]());
 
         guessValueWidget.find(menuClass)
-            .click(guessValueSquareClickHandler)
+            .on("click", ".guess-value:not(.notSelectable)", guessValueSquareClickHandler)
             .find(menuItemClass).each(function(index, menuItem) {
                 if (values.indexOf(index + 1) !== -1) {
                     $(menuItem).addClass('notSelectable');
