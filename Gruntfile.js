@@ -30,13 +30,13 @@ module.exports = function(grunt) {
             dist: {
                 files: [
                     {expand: true, cwd: 'src', dest: '<%= distPath %>',
-                        src: 'js/*.js'
+                        src: 'js/**'
                     },
 
                     {expand: true, cwd: 'src', dest: '<%= distPath %>',
                         src: 'lib/**'
                     },
-                    {expand: true, cwd: 'src', dest: '<%= debugPath %>',
+                    {expand: true, cwd: 'src', dest: '<%= distPath %>',
                         src: 'index.html'
                     }
                 ]
@@ -53,7 +53,7 @@ module.exports = function(grunt) {
                     dest: '<%= debugPath %>css/sudoku.css'
                 }]
             },
-            dist: [{
+            dist: {
                 options: {
                     style: 'compressed'
                 },
@@ -61,7 +61,7 @@ module.exports = function(grunt) {
                     src: ['src/css/sudokuApp.scss'],
                     dest: '<%= distPath %>css/sudoku.css'
                 }]
-            }]
+            }
         },
 
         clean: {
@@ -70,7 +70,7 @@ module.exports = function(grunt) {
         },
 
         handlebars: {
-          compile: {
+          debug: {
             options: {
               namespace: "Sudoku.templates",
               processName: function(filePath) {
@@ -79,6 +79,17 @@ module.exports = function(grunt) {
             },
             files: {
               "<%= debugPath %>templates/templates.js": "src/templates/**.handlebars"
+            }
+          },
+          dist: {
+            options: {
+              namespace: "Sudoku.templates",
+              processName: function(filePath) {
+                    return filePath.replace(/^src\/templates\//, '').replace(/\.handlebars$/, '');
+                },
+            },
+            files: {
+              "<%= distPath %>templates/templates.js": "src/templates/**.handlebars"
             }
           }
         },
@@ -101,6 +112,15 @@ module.exports = function(grunt) {
                 '<%= distPath %>sudoku.js': ['<%= distPath %>/js/**/*.js'],
               },
             },
+        },
+
+        uglify: {
+            my_target: {
+                files: [{
+                    src: '<%= distPath %>sudoku.js',
+                    dest: '<%= distPath %>sudoku.js'
+                }]
+            }
         }
     };
 
@@ -110,8 +130,8 @@ module.exports = function(grunt) {
     grunt.initConfig(config);
 
     grunt.registerTask("debug", "Unminified debug build",
-        ['clean:debug', 'handlebars:compile', 'sass:debug', 'copy:debug', 'concat:debug']);
+        ['clean:debug', 'handlebars:debug', 'sass:debug', 'copy:debug', 'concat:debug']);
 
     grunt.registerTask("dist", "Minified, concatenated dist build",
-        ['clean:dist', 'handlebars:compile', 'sass:dist', 'copy:dist', 'concat:dist']);
+        ['clean:dist', 'handlebars:dist', 'sass:dist', 'copy:dist', 'concat:dist', 'uglify']);
 };
